@@ -13,6 +13,8 @@
             </style>
         @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @stack('scripts')
 </head>
 
 <body class="flex flex-row w-full h-screen">

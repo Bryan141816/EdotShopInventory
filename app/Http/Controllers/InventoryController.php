@@ -4,13 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $inventory = Product::all();
+        $search = $request->input('search');
+
+        $inventory = Product::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->get();
 
         return view('pages.inventory', compact('inventory'));
     }
@@ -90,9 +98,7 @@ class InventoryController extends Controller
             }
 
             $product->image = null;
-        }
-
-        elseif ($request->hasFile('image')) {
+        } elseif ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
