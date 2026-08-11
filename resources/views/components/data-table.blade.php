@@ -1,11 +1,12 @@
+@use('Illuminate\Support\Facades\Storage')
+
 <div class="w-full overflow-x-auto">
     <table class="w-full table-auto">
         <thead class="text-[13px] font-medium text-slate-500/70">
             <tr>
                 @foreach ($headers as $label => $column)
                     <th
-                        class="whitespace-nowrap bg-slate-100 px-5 py-2 text-left first:rounded-l first:pl-3 last:rounded-r last:pr-3"
-                    >
+                        class="whitespace-nowrap bg-slate-100 px-5 py-2 text-left first:rounded-l first:pl-3 last:rounded-r last:pr-3">
                         {{ $label }}
                     </th>
                 @endforeach
@@ -14,63 +15,72 @@
 
         <tbody class="text-sm font-normal">
             @forelse ($rows as $item)
-                <tr class="border-b border-slate-200 last:border-none">
+                <tr class="border-b border-slate-200 last:border-none" name="{{ $item->id }}">
                     @foreach ($headers as $label => $column)
                         @php
                             $value = data_get($item, $column['key']);
                             $type = $column['type'] ?? 'text';
                         @endphp
 
-                        <td
-                            class="whitespace-nowrap px-5 py-3 first:pl-3 last:pr-3"
-                        >
+                        <td class="whitespace-nowrap px-5 py-3 first:pl-3 last:pr-3" data-key="{{ $column['key'] }}"
+                            data-value="{{ $type === 'image' && $value ? Storage::url($value) : ($type === 'image' ? '' : $value) }}">
                             @switch($type)
-
                                 @case('text')
-                                    {{ $value }}
-                                    @break
+                                    {{ $value ?? '...' }}
+                                @break
 
                                 @case('image')
                                     @if ($value)
-                                        <img
-                                            src="{{ asset($value) }}"
-                                            alt="{{ $label }}"
-                                            class="size-10 rounded-lg object-cover border border-slate-600"
-                                        >
+                                        <div class="group relative w-fit">
+                                            {{-- Thumbnail --}}
+                                            <img src="{{ Storage::url($value) }}" alt="{{ $label }}"
+                                                class="size-10 rounded-lg border border-slate-600 object-cover">
+
+                                            {{-- Preview --}}
+                                            <div class="pointer-events-none fixed z-50 hidden group-hover:block"
+                                                style="
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                ">
+                                                <div class="rounded-xl border border-slate-200 bg-white p-2 shadow-2xl">
+                                                    <img src="{{ Storage::url($value) }}" alt="{{ $label }}"
+                                                        class="h-72 w-72 rounded-lg object-contain">
+                                                </div>
+                                            </div>
+                                        </div>
                                     @else
                                         <div
-                                            class="flex size-10 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-400 text-center border border-slate-600"
-                                        >
-                                            No 
+                                            class="flex size-10 items-center justify-center rounded-lg border border-slate-600 bg-slate-100 text-center text-xs text-slate-400">
+                                            No
                                             <br>
                                             image
                                         </div>
                                     @endif
-                                    @break
+                                @break
 
                                 @case('price')
                                     ₱{{ number_format((float) $value, 2) }}
-                                    @break
+                                @break
 
                                 @case('number')
                                     {{ number_format((int) $value) }}
-                                    @break
+                                @break
 
                                 @case('date')
                                     {{ $value ? \Carbon\Carbon::parse($value)->format('M d, Y') : '-' }}
-                                    @break
+                                @break
 
                                 @case('datetime')
                                     {{ $value ? \Carbon\Carbon::parse($value)->format('M d, Y h:i A') : '-' }}
-                                    @break
+                                @break
 
                                 @case('badge')
                                     <span
-                                        class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-normal text-slate-600"
-                                    >
+                                        class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-normal text-slate-600">
                                         {{ $value }}
                                     </span>
-                                    @break
+                                @break
 
                                 @case('boolean')
                                     @if ($value)
@@ -82,25 +92,25 @@
                                             No
                                         </span>
                                     @endif
-                                    @break
+                                @break
+
+                                @case('action')
+                                    {{ $action }}
+                                @break
 
                                 @default
                                     {{ $value }}
-
                             @endswitch
                         </td>
                     @endforeach
                 </tr>
-            @empty
-                <tr>
-                    <td
-                        colspan="{{ count($headers) }}"
-                        class="px-5 py-10 text-center text-sm text-slate-400"
-                    >
-                        No records found.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+                @empty
+                    <tr>
+                        <td colspan="{{ count($headers) }}" class="px-5 py-10 text-center text-sm text-slate-400">
+                            No records found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
