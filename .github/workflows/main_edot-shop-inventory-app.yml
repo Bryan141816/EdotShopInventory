@@ -61,7 +61,7 @@ jobs:
 
       - name: Run Migrations
         env:
-          AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
         run: |
           USERNAME=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE" | grep -oP '(?<=userName=")[^"]+')
           PASSWORD=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE" | grep -oP '(?<=userPWD=")[^"]+')
