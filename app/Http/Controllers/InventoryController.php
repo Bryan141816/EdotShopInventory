@@ -11,13 +11,21 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $pageLength = $request->input('page_length', 10);
 
-        $inventory = Items::query()->when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%");
-        })->get();
+        $inventory = Items::query()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                });
+            })
+            ->paginate($pageLength)
+            ->withQueryString();
 
         $count = Items::count();
-        return view('pages.inventory', compact('inventory', 'count') );
+
+        return view('pages.inventory', compact('inventory', 'count'));
     }
 
     public function store(Request $request)

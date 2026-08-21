@@ -100,7 +100,7 @@
         <div class="flex flex-row justify-between mb-4">
             <form action="/inventory" method="GET">
                 <input type="text" name="search" placeholder="Search..."
-                    class="border border-gray-300 rounded px-2 py-1" id="search-input">
+                    class="border border-gray-300 rounded px-2 py-1" id="search-input" value="{{ request('search', '') }}">
 
                 <button type="submit"
                     class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 ml-2">
@@ -170,6 +170,118 @@
                 </div>
             </x-slot>
         </x-data-table>
+        <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+
+            {{-- Left: Page length --}}
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <span>Rows per page</span>
+
+                <select onchange="window.location.href = this.value"
+                    class="rounded-md border-gray-300 bg-white py-1.5 pl-3 pr-8 text-sm
+                   focus:border-indigo-500 focus:ring-indigo-500">
+                    @foreach ([10, 25, 50, 100] as $length)
+                        <option
+                            value="{{ request()->fullUrlWithQuery([
+                                'page_length' => $length,
+                                'page' => 1,
+                            ]) }}"
+                            @selected(request('page_length', 10) == $length)>
+                            {{ $length }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <span class="whitespace-nowrap">
+                {{ $inventory->firstItem() ?? 0 }}
+                –
+                {{ $inventory->lastItem() ?? 0 }}
+                of
+                {{ $inventory->total() }}
+            </span>
+            {{-- Pagination --}}
+            <div class="flex items-center gap-1">
+
+                {{-- First page --}}
+                @if ($inventory->onFirstPage())
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md text-gray-300">
+                        &laquo;
+                    </span>
+                @else
+                    <a href="{{ $inventory->url(1) }}"
+                        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100">
+                        &laquo;
+                    </a>
+                @endif
+
+
+                {{-- Previous --}}
+                @if ($inventory->onFirstPage())
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md text-gray-300">
+                        &lsaquo;
+                    </span>
+                @else
+                    <a href="{{ $inventory->previousPageUrl() }}"
+                        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100">
+                        &lsaquo;
+                    </a>
+                @endif
+
+
+                {{-- Page numbers --}}
+                @php
+                    $current = $inventory->currentPage();
+                    $last = $inventory->lastPage();
+
+                    // Maximum of 4 page buttons
+                    $start = max(1, min($current - 1, $last - 3));
+                    $end = min($last, $start + 3);
+                @endphp
+
+                @for ($page = $start; $page <= $end; $page++)
+                    @if ($page == $current)
+                        <span
+                            class="flex h-8 min-w-8 items-center justify-center rounded-md
+                       text-sm font-medium text-white bg-blue-600 px-4 py-2  hover:bg-blue-700">
+                            {{ $page }}
+                        </span>
+                    @else
+                        <a href="{{ $inventory->url($page) }}"
+                            class="flex h-8 min-w-8 items-center justify-center rounded-md
+                       px-2 text-sm text-gray-600 hover:bg-gray-100">
+                            {{ $page }}
+                        </a>
+                    @endif
+                @endfor
+
+
+                {{-- Next --}}
+                @if ($inventory->hasMorePages())
+                    <a href="{{ $inventory->nextPageUrl() }}"
+                        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100">
+                        &rsaquo;
+                    </a>
+                @else
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md text-gray-300">
+                        &rsaquo;
+                    </span>
+                @endif
+
+
+                {{-- Last page --}}
+                @if ($current == $last)
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md text-gray-300">
+                        &raquo;
+                    </span>
+                @else
+                    <a href="{{ $inventory->url($last) }}"
+                        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100">
+                        &raquo;
+                    </a>
+                @endif
+
+            </div>
+        </div>
     </div>
 @endsection
 
