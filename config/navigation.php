@@ -10,5 +10,10 @@ return [
         'label' => 'Inventory',
         'route' => 'inventory',
         'icon'  => 'package',
+    ],
+    [
+        'label' => 'POS',
+        'route' => 'inventory',
+        'icon'  => 'shopping-basket',
     ]
 ];
