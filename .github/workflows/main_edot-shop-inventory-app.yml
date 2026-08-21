@@ -58,3 +58,13 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
+
+      - name: Run Laravel migrations
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az webapp ssh \
+              --name edot-shop-inventory-app \
+              --resource-group YOUR_RESOURCE_GROUP \
+              --command "php artisan migrate --force"
