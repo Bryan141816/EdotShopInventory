@@ -59,12 +59,22 @@ jobs:
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
 
-      - name: Run Laravel migrations
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az webapp ssh \
-              --name edot-shop-inventory-app \
-              --resource-group edot-shop-inventory-rg \
-              --command "php artisan migrate --force"
+      - name: Run Migrations and Show Logs
+        run: |
+          # Install expect to handle the interactive SSH session
+          sudo apt-get install -y expect
+
+          # Extract credentials from the publish profile
+          USERNAME=$(echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" | grep -oP '(?<=userName=")[^"]+')
+          PASSWORD=$(echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" | grep -oP '(?<=userPWD=")[^"]+')
+
+          # Use expect to automate the SSH session
+          expect -c "
+            set timeout 60
+            spawn az webapp ssh --name 'edot-shop-inventory-app' --resource-group '${{ secrets.AZURE_RESOURCE_GROUP }}'
+            expect \"root@\" 
+            send \"cd /home/site/wwwroot && php artisan migrate --force\r\"
+            expect \"root@\"
+            send \"exit\r\"
+            expect eof
+          "
