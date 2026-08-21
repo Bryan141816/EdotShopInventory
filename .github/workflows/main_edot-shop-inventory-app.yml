@@ -59,20 +59,24 @@ jobs:
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
 
-      - name: Run Migrations
+      - name: Run Laravel Migrations
         env:
-          AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
+          PUBLISH_PROFILE: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
         run: |
-          USERNAME=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE" | grep -oP '(?<=userName=")[^"]+')
-          PASSWORD=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE" | grep -oP '(?<=userPWD=")[^"]+')
+          USERNAME=$(echo "$PUBLISH_PROFILE" | grep -oP '(?<=userName=")[^"]+')
+          PASSWORD=$(echo "$PUBLISH_PROFILE" | grep -oP '(?<=userPWD=")[^"]+')
+
+          if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+            echo "Failed to extract Kudu credentials."
+            exit 1
+          fi
 
           curl --fail-with-body \
             -u "$USERNAME:$PASSWORD" \
             -X POST \
             "https://edot-shop-inventory-app.scm.azurewebsites.net/api/command" \
             -H "Content-Type: application/json" \
-            -H "User-Agent: github-actions" \
             -d '{
-              "command": "php artisan migrate --force && tail -n 100 storage/logs/laravel.log",
+              "command": "php artisan migrate --force",
               "dir": "/home/site/wwwroot"
             }'
