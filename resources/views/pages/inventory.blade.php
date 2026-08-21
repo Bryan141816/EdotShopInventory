@@ -100,7 +100,7 @@
         <div class="flex flex-row justify-between mb-4">
             <form action="/inventory" method="GET">
                 <input type="text" name="search" placeholder="Search..."
-                    class="border border-gray-300 rounded px-2 py-1" id="search-input">
+                    class="border border-gray-300 rounded px-2 py-1" id="search-input" value="{{ request('search', '') }}">
 
                 <button type="submit"
                     class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 ml-2">
