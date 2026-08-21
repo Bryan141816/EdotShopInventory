@@ -66,5 +66,5 @@ jobs:
           inlineScript: |
             az webapp ssh \
               --name edot-shop-inventory-app \
-              --resource-group YOUR_RESOURCE_GROUP \
+              --resource-group edot-shop-inventory-rg \
               --command "php artisan migrate --force"
