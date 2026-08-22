@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 LOG_FILE="/home/LogFiles/deployment.sh.log"
 
 # Send stdout and stderr to both the console and the log file
