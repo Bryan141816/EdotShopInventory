@@ -32,7 +32,17 @@ jobs:
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
         run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run 'npm run build'
+        run: npm run buildF
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -58,29 +68,3 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Create SSH connection
-        run: |
-          az webapp create-remote-connection \
-            --resource-group edot-shop-inventory-rg \
-            --name edot-shop-inventory-app \
-            --port 55200 > /tmp/ssh.log 2>&1 &
-
-          echo $! > /tmp/ssh.pid
-
-          sleep 10
-
-          cat /tmp/ssh.log
-
-      - name: Run Laravel migrations
-        run: |
-          ssh \
-            -o StrictHostKeyChecking=no \
-            -p 55200 \
-            root@127.0.0.1 \
-            "cd /home/site/wwwroot && php artisan migrate --force"
