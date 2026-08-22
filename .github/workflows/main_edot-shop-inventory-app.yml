@@ -48,7 +48,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: php-app
-          path: .
+          path: |
+            .
+            !.git/
+            !.github/
+            !node_modules/
+            !tests/
+            !.env
+            !terraform/
+
+          include-hidden-files: true
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
