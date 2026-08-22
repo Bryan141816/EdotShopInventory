@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Run 'npm run build'
-        run: npm run buildF
+        run: npm run build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
