@@ -59,20 +59,17 @@ jobs:
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
 
-      - name: Run Laravel Migrations
-        env:
-          PUBLISH_PROFILE: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_06BFAF156D234800A4DF5BB2DAAECE4D }}
-        run: |
-          USERNAME=$(echo "$PUBLISH_PROFILE" | grep -oP '(?<=userName=")[^"]+')
-          PASSWORD=$(echo "$PUBLISH_PROFILE" | grep -oP '(?<=userPWD=")[^"]+')
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-          if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
-            echo "Failed to extract Kudu credentials."
-            exit 1
-          fi
+      - name: Run Laravel Migrations
+        run: |
+          TOKEN=$(az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv)
 
           curl --fail-with-body \
-            -u "$USERNAME:$PASSWORD" \
+            -H "Authorization: Bearer $TOKEN" \
             -X POST \
             "https://edot-shop-inventory-app.scm.azurewebsites.net/api/command" \
             -H "Content-Type: application/json" \
