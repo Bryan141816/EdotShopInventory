@@ -64,16 +64,23 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Run Laravel Migrations
+      - name: Create SSH connection
         run: |
-          TOKEN=$(az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv)
+          az webapp create-remote-connection \
+            --resource-group edot-shop-inventory-rg \
+            --name edot-shop-inventory-app \
+            --port 55200 > /tmp/ssh.log 2>&1 &
 
-          curl --fail-with-body \
-            -H "Authorization: Bearer $TOKEN" \
-            -X POST \
-            "https://edot-shop-inventory-app.scm.azurewebsites.net/api/command" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "command": "php artisan migrate --force",
-              "dir": "/home/site/wwwroot"
-            }'
+          echo $! > /tmp/ssh.pid
+
+          sleep 10
+
+          cat /tmp/ssh.log
+
+      - name: Run Laravel migrations
+        run: |
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -p 55200 \
+            root@127.0.0.1 \
+            "cd /home/site/wwwroot && php artisan migrate --force"
