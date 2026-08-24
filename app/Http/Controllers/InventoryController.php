@@ -13,7 +13,7 @@ class InventoryController extends Controller
         $search = $request->input('search');
         $pageLength = $request->input('page_length', 10);
 
-        $inventory = Items::query()
+        $inventory = Items::with(['brand', 'category'])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -22,7 +22,7 @@ class InventoryController extends Controller
             })
             ->paginate($pageLength)
             ->withQueryString();
-
+        
         $count = Items::count();
 
         return view('pages.inventory', compact('inventory', 'count'));

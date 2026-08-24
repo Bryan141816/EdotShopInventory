@@ -10,9 +10,29 @@ export default () => ({
     selling_price: "",
     quantity: "",
     image: "",
-    description: ""
+    description: "",
+    brand_id: "",
+    category_id: ""
   },
 
+  brands: null,
+  category: null,
+
+  async openItemModal() {
+    this.itemModalOpen = true;
+
+    try {
+      const response = await fetch("/api/brand_category");
+      if(!response.ok){
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const result = await response.json();
+      this.brands = result.brands;
+      this.category = result.category;
+    }catch(error){
+      console.error(error.message);
+    }
+  },
   closeModal() {
     this.itemModalOpen = false;
     this.isEdit = false;

@@ -23,4 +23,14 @@ class Items extends Model
         'quantity' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    public function brand()
+    {
+        return $this->belongsTo(PartBrands::class, 'brand_id');
+    }
+    public function category()
+    {
+        return $this->belongsTo(PartCategory::class, 'category_id');
+    }
 }
+
