@@ -60,6 +60,11 @@ return [
             'report' => false,
         ],
 
+        'azure' => [
+            'driver' => 'azure-storage-blob',
+            'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
+            'container' => env('AZURE_STORAGE_CONTAINER'),
+        ],
     ],
 
     /*
@@ -72,6 +77,8 @@ return [
     | the locations of the links and the values should be their targets.
     |
     */
+    // config/filesystems.php
+
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
