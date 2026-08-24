@@ -51,7 +51,7 @@ class InventoryController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $path = $file->store('images', 'public');
+            $path = $file->store('images', config('filesystems.default'));
             $items->image = $path;
         }
 
@@ -62,6 +62,12 @@ class InventoryController extends Controller
 
     public function destroy(Items $item)
     {
+        $disk = config('filesystems.default');
+
+        if ($item->image) {
+            Storage::disk($disk)->delete($item->image);
+        }
+
         $item->delete();
 
         return redirect()->back()->with('success', 'Product deleted successfully!');
@@ -91,18 +97,21 @@ class InventoryController extends Controller
         $item->selling_price = $request->input('selling_price');
         $item->quantity = $request->input('quantity');
 
+        $disk = config('filesystems.default');
+
         if ($request->boolean('remove_image')) {
             if ($item->image) {
-                Storage::disk('public')->delete($item->image);
+                Storage::disk($disk)->delete($item->image);
             }
 
             $item->image = null;
+
         } elseif ($request->hasFile('image')) {
             if ($item->image) {
-                Storage::disk('public')->delete($item->image);
+                Storage::disk($disk)->delete($item->image);
             }
 
-            $item->image = $request->file('image')->store('images', 'public');
+            $item->image = $request->file('image')->store('images', $disk);
         }
 
         $item->save();
