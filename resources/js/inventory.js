@@ -35,7 +35,7 @@ export default () => ({
   },
   openItemModal() {
     this.itemModalOpen = true;
-
+    this.fetchBrandAndCategory();
   },
 
   itemModalClose() {

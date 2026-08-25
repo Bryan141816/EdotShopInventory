@@ -17,8 +17,12 @@
     <div class="flex flex-col h-full w-full" x-data="brand">
 
         <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
-            <form class="flex flex-col gap-4 p-3 pt-0" action="{{ route('brands.store') }}" method="POST">
+            
+            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/brands/${id}`: '/brands'" method="POST">
                 @csrf
+                <template x-if="isEdit">
+                    <input type="hidden" name="_method" value="PATCH">
+                </template>
                 <div class="flex flex-col gap-1">
                     <label for="brand-name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
                     <input id="brand-name" name="name" type="text" required maxlength="255"
@@ -54,7 +58,7 @@
                 </button>
             </form>
             <button class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                @click="openModal">
+                @click="openCreateModal">
                 <x-lucide-plus class="mr-2 h-4 w-4" />
                 <span>Add Brand</span>
             </button>

@@ -37,6 +37,9 @@
             <form enctype="multipart/form-data" id="item-form" method="POST"
                 :action="isEdit ? `/inventory/${id}` : '/inventory'" class="flex flex-col p-3 pt-0">
                 @csrf
+                <template x-if="isEdit">
+                    <input type="hidden" name="_method" value="PATCH">
+                </template>
                 <div class="flex flex-col gap-3 w-fit overflow-auto">
                     <div class="flex flex-col gap-1">
                         <label for="name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>

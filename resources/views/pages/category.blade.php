@@ -5,19 +5,22 @@
 @section('content')
     <div class="flex flex-col h-full w-full" x-data="category">
         <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
-            <form class="flex flex-col gap-4 p-3 pt-0" action="{{ route('category.store') }}" method="POST">
+            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/category/${id}`: '/category'" method="POST">
                 @csrf
+                <template x-if="isEdit">
+                    <input type="hidden" name="_method" value="PATCH">
+                </template>
                 <div class="flex flex-col gap-1">
-                    <label for="brand-name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
-                    <input id="brand-name" name="name" type="text" required maxlength="255"
-                        class="rounded border border-gray-300 px-2 py-1" placeholder="Enter brand name"
-                        x-model="brandInput.name">
+                    <label for="category-name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
+                    <input id="category-name" name="name" type="text" required maxlength="255"
+                        class="rounded border border-gray-300 px-2 py-1" placeholder="Enter category name"
+                        x-model="categoryInput.name">
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label for="brand-description" class="text-sm font-medium">Description</label>
-                    <textarea id="brand-description" name="description" rows="3"
+                    <label for="category-description" class="text-sm font-medium">Description</label>
+                    <textarea id="category-description" name="description" rows="3"
                         class="resize-none rounded border border-gray-300 px-2 py-1" placeholder="Optional description"
-                        x-model="brandInput.description"></textarea>
+                        x-model="categoryInput.description"></textarea>
                 </div>
                 <div class="flex justify-end gap-2">
                     <button type="button" @click="closeModal"
@@ -32,7 +35,7 @@
         </x-modal>
         <h3 class="font-semibold text-2xl">Category</h3>
         <div class="flex flex-row justify-between mb-4">
-            <form action={{ route('brands') }} method="GET">
+            <form action={{ route('category') }} method="GET">
                 <input type="text" name="search" placeholder="Search..." class="border border-gray-300 rounded px-2 py-1"
                     id="search-input" value="{{ request('search', '') }}">
 
@@ -42,7 +45,7 @@
                 </button>
             </form>
             <button class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                @click="openModal">
+                @click="openCreateModal">
                 <x-lucide-plus class="mr-2 h-4 w-4" />
                 <span>Add Category</span>
             </button>

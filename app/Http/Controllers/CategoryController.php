@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PartCategory;
 use Exception;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -23,22 +24,25 @@ class CategoryController extends Controller
 
         return view('pages.category', compact('category'));
     }
+
     private function commonStore(Request $request)
     {
         $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string'
-            ]);
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
 
-        $category = new PartCategory();
+        $category = new PartCategory;
         $category->name = strtoupper($request->input('name'));
         $category->description = $request->input('description');
         $category->save();
     }
+
     public function store(Request $request)
     {
         try {
             $this->commonStore($request);
+
             return redirect()->back()->with('success', 'Category added successfully!');
         } catch (ValidationException $e) {
             dd($e);
@@ -46,17 +50,20 @@ class CategoryController extends Controller
             if ($e->errorInfo[1] == 1062) {
                 return redirect()->back()->with('error', 'Category with this name already exist');
             }
+
             return redirect()->back()->with('error', 'An error occured in the database');
         } catch (Exception $e) {
             dd($e);
         }
     }
+
     public function apiStore(Request $request)
     {
         try {
             $category = $this->commonStore($request);
+
             return response()->json([
-                "category" => $category
+                'category' => $category,
             ], 200);
         } catch (ValidationException $e) {
             dd($e);
@@ -76,9 +83,34 @@ class CategoryController extends Controller
             dd($e);
         }
     }
+
+    public function edit(Request $request, PartCategory $category)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
+
+            $category->name = $request->input('name');
+            $category->description = $request->input('description');
+
+            $category->save();
+
+            return redirect()->back()->with('success', 'Category updated successfully');
+        } catch (ValidationException $e) {
+            dd($e->errors());
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'An error occured in the database');
+        } catch (RecordNotFoundException $e) {
+            return redirect()->back()->with('erro', 'Category not found');
+        }
+    }
+
     public function destroy(PartCategory $category)
     {
         $category->delete();
+
         return redirect()->back()->with('success', 'Category deleted successfully');
     }
 }
