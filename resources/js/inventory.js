@@ -1,6 +1,6 @@
 export default () => ({
   itemModalOpen: false,
-  title: 'Add Item',
+  itemModalTitle: 'Add Item',
   isEdit: false,
   id: null,
   itemInput: {
@@ -18,22 +18,25 @@ export default () => ({
   brands: null,
   category: null,
 
+
+
   async openItemModal() {
     this.itemModalOpen = true;
 
     try {
       const response = await fetch("/api/brand_category");
-      if(!response.ok){
+      if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
       const result = await response.json();
       this.brands = result.brands;
       this.category = result.category;
-    }catch(error){
+    } catch (error) {
       console.error(error.message);
     }
   },
-  closeModal() {
+
+  itemModalClose() {
     this.itemModalOpen = false;
     this.isEdit = false;
     this.itemInput = {
@@ -43,7 +46,9 @@ export default () => ({
       selling_price: "",
       quantity: "",
       image: "",
-      description: ""
+      description: "",
+      brand_id: "",
+      category_id: ""
     };
     this.id = null;
     this.title = 'Add Item'
@@ -105,5 +110,75 @@ export default () => ({
     this.itemModalOpen = true;
     this.isEdit = true;
     this.title = "Update Item";
-  }
+  },
+
+  //Brand & Category
+  brandModalOpen: false,
+  brandModalTitle: "Create Brand",
+  brandSaving: false,
+  brandError: "",
+  brandInput: {
+    name: "",
+    description: ""
+  },
+  brandModalmode: "brand",
+
+  openBrandModal() {
+    this.brandModalOpen = true;
+    this.brandError = "";
+    this.brandInput = { name: "", description: "" };
+    this.brandModalTitle = "Create Brand";
+    this.$nextTick(() => document.getElementById("brand-name")?.focus());
+    this.brandModalmode = "brand";
+  },
+
+  closeBrandModal() {
+    this.brandModalOpen = false;
+    this.brandSaving = false;
+    this.brandError = "";
+  },
+
+  openCategoryModal() {
+    this.brandModalOpen = true;
+    this.brandError = "";
+    this.brandInput = { name: "", description: "" };
+    this.brandModalTitle = "Create Category";
+    this.$nextTick(() => document.getElementById("brand-name")?.focus());
+    this.brandModalmode = "category";
+  },
+
+  async createBrand() {
+    this.brandSaving = true;
+    this.brandError = "";
+
+    try {
+      const url = this.brandModalmode == "brand" ? "/api/brands" : "/api/category";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(this.$refs.brandForm),
+        credentials: 'include'
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        this.brandError = result.errors?.name?.[0] ?? result.message ?? `Unable to create the ${this.brandModalmode}.`;
+        return;
+      }
+      if (this.brandModalmode == "brand") {
+        this.brands = [...(this.brands ?? []), result.brand];
+        this.itemInput.brand_id = result.brand.id;
+      }
+      else {
+        this.category = [...(this.category ?? []), result.category];
+        this.itemInput.category_id = result.category.id;
+      }
+      this.closeBrandModal();
+    } catch {
+      this.brandError = `Unable to create the ${this.brandModalmode}. Please try again.`;
+    } finally {
+      this.brandSaving = false;
+    }
+  },
+
 });

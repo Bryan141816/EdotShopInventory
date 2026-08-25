@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->foreignId('brand_id')->nullable()->contrained('part_brands')->nullOnDelete();
-            $table->foreignId('category_id')->nullable()->contrained('part_category')->nullOnDelete();
+        Schema::table('part_brands', function (Blueprint $table) {
+            $table->unique('name');
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            //
+        Schema::table('part_brands', function (Blueprint $table) {
+            $table->dropUnique('name');
         });
     }
 };

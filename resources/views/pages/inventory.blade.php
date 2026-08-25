@@ -1,11 +1,39 @@
 @extends('layout.app')
 
-@section('title', 'Inventory')
+@section('title', 'Inventory | Products')
 
 @section('content')
-    <div class="flex flex-col h-full w-full" x-data="itemModal">
+    <div class="flex flex-col h-full w-full" x-data="inventory">
 
-        <x-modal openState="itemModalOpen" closeModal="itemModalClose" x-show="itemModalOpen">
+        <x-modal title="brandModalTitle" closeModal="closeBrandModal" x-show="brandModalOpen" class="z-999">
+            <form x-ref="brandForm" @submit.prevent="createBrand" class="flex flex-col gap-4 p-3 pt-0">
+                @csrf
+                <div class="flex flex-col gap-1">
+                    <label for="brand-name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
+                    <input id="brand-name" name="name" type="text" required maxlength="255"
+                        class="rounded border border-gray-300 px-2 py-1" placeholder="Enter brand name"
+                        x-model="brandInput.name">
+                    <p x-show="brandError" x-text="brandError" class="text-sm text-red-600"></p>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="brand-description" class="text-sm font-medium">Description</label>
+                    <textarea id="brand-description" name="description" rows="3"
+                        class="resize-none rounded border border-gray-300 px-2 py-1" placeholder="Optional description"
+                        x-model="brandInput.description"></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="closeBrandModal"
+                        class="rounded bg-gray-300 px-4 py-2 font-bold text-gray-700 hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" :disabled="brandSaving"
+                        class="rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        x-text="brandSaving ? 'Creating...' : brandModalTitle"></button>
+                </div>
+            </form>
+        </x-modal>
+
+        <x-modal openState="itemModalOpen" closeModal="itemModalClose" x-show="itemModalOpen" title="itemModalTitle">
             <form enctype="multipart/form-data" id="item-form" method="POST"
                 :action="isEdit ? `/inventory/${id}` : '/inventory'" class="flex flex-col p-3 pt-0">
                 @csrf
@@ -39,15 +67,16 @@
                                 </svg>
                                 &nbsp;Loading ...
                             </div>
-                            <select class="border border-gray-300 rounded px-2 py-1 w-full" x-model="brand_id"
-                                x-show="brands != null" name="brand_id">
+                            <select class="border border-gray-300 rounded px-2 py-1 w-full" 
+                                x-show="brands != null" name="brand_id" x-model="itemInput.brand_id" x-model="itemInput.brand_id">
                                 <option value="" >----</option>
                                 <template x-for="brand in brands">
                                     <option x-text="brand.name" :value="brand.id"></option>
                                 </template>
                             </select>
                             <button type="button"
-                                class="w-9 h-9 inline-flex items-center justify-center rounded bg-blue-600 font-bold text-white hover:bg-blue-700">
+                                class="w-9 h-9 inline-flex items-center justify-center rounded bg-blue-600 font-bold text-white hover:bg-blue-700"
+                                @click="openBrandModal">
                                 <x-lucide-plus class="w-4 h-4" />
                             </button>
                         </div>
@@ -71,15 +100,17 @@
                                 </svg>
                                 &nbsp;Loading ...
                             </div>
-                            <select class="border border-gray-300 rounded px-2 py-1 w-full" x-model="category_id"
-                                x-show="category != null" name="category_id">
+                            <select class="border border-gray-300 rounded px-2 py-1 w-full"
+                                x-show="category != null" name="category_id" x-model="itemInput.category_id">
                                 <option value="">----</option>
                                 <template x-for="cats in category">
                                     <option x-text="cats.name" :value="cats.id"></option>
                                 </template>
                             </select>
                             <button type="button"
-                                class="w-9 h-9 inline-flex items-center justify-center rounded bg-blue-600 font-bold text-white hover:bg-blue-700">
+                                class="w-9 h-9 inline-flex items-center justify-center rounded bg-blue-600 font-bold text-white hover:bg-blue-700"
+                                @click="openCategoryModal"
+                                >
                                 <x-lucide-plus class="w-4 h-4" />
                             </button>
                         </div>
@@ -147,20 +178,20 @@
                     </div>
                 </div>
                 <div class="flex flex-row justify-end">
-                    <button type="button" @click="closeModal"
+                    <button type="button" @click="itemModalClose"
                         class="mt-4 inline-flex items-center rounded bg-gray-300 px-4 py-2 font-bold text-gray-700 hover:bg-gray-400 mr-2">
                         Cancel
                     </button>
                     <button type="submit"
                         class="mt-4 inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                        id="submit-button" x-text="title">
+                        id="submit-button" x-text="itemModalTitle">
 
                     </button>
                 </div>
             </form>
         </x-modal>
 
-        <h3 class="font-semibold text-2xl">Inventory</h3>
+        <h3 class="font-semibold text-2xl">Products</h3>
         <div class="flex flex-row justify-between mb-4">
             <form action="/inventory" method="GET">
                 <input type="text" name="search" placeholder="Search..."
@@ -327,7 +358,6 @@
                 @endfor
 
 
-                {{-- Next --}}
                 @if ($inventory->hasMorePages())
                     <a href="{{ $inventory->nextPageUrl() }}"
                         class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100">
@@ -340,7 +370,6 @@
                 @endif
 
 
-                {{-- Last page --}}
                 @if ($current == $last)
                     <span class="flex h-8 w-8 items-center justify-center rounded-md text-gray-300">
                         &raquo;
@@ -356,11 +385,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script type="module" src="{{ Vite::asset('resources/js/inventory/item-modal.js') }}"></script>
-
-    <script type="module">
-        const itemCount = "{{ $count }}";
-    </script>
-@endpush

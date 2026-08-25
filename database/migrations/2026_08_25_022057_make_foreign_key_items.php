@@ -12,9 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->integer('brand_id')->default(0);
-            $table->integer('category_id')->default(0);
+            $table->unsignedBigInteger('brand_id')->nullable()->after('id'); 
+            $table->unsignedBigInteger('category_id')->nullable()->after('brand_id'); 
             $table->integer('minimum_stock')->default(0);
+
+            $table->foreign('brand_id')
+                ->references('id')
+                ->on('part_brands')
+                ->nullOnDelete();
+
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('part_category')
+                ->nullOnDelete();
         });
     }
 
@@ -24,6 +34,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('items', function (Blueprint $table) {
+            $table->dropForeign(['brand_id']);
+            $table->dropForeign(['category_id']);
+            
             $table->dropColumn('brand_id');
             $table->dropColumn('category_id');
             $table->dropColumn('minimum_stock');

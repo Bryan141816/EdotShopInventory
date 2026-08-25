@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Items;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class InventoryController extends Controller
 {
@@ -22,10 +23,7 @@ class InventoryController extends Controller
             })
             ->paginate($pageLength)
             ->withQueryString();
-        
-        $count = Items::count();
-
-        return view('pages.inventory', compact('inventory', 'count'));
+        return view('pages.inventory', compact('inventory'));
     }
 
     public function store(Request $request)
@@ -38,7 +36,8 @@ class InventoryController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-
+            'brand_id' => 'nullable|integer',
+            'category_id' => 'nullable|integer'
         ]);
 
         $items = new Items;
@@ -48,6 +47,8 @@ class InventoryController extends Controller
         $items->cost_price = $request->input('cost_price');
         $items->selling_price = $request->input('selling_price');
         $items->quantity = $request->input('quantity');
+        $items->brand_id = $request->input('brand_id');
+        $items->category_id = $request->input('category_id');
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -85,6 +86,8 @@ class InventoryController extends Controller
                 'quantity' => 'required|integer|min:0',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'remove_image' => 'nullable|boolean',
+                'brand_id' => 'integer',
+                'category_id' => 'integer'
             ]);
         } catch (ValidationException $e) {
             dd($e->errors());
@@ -96,6 +99,8 @@ class InventoryController extends Controller
         $item->cost_price = $request->input('cost_price');
         $item->selling_price = $request->input('selling_price');
         $item->quantity = $request->input('quantity');
+        $item->brand_id = $request->input('brand_id');
+        $item->category_id = $request->input('category_id');
 
         $disk = config('filesystems.default');
 
@@ -105,7 +110,6 @@ class InventoryController extends Controller
             }
 
             $item->image = null;
-
         } elseif ($request->hasFile('image')) {
             if ($item->image) {
                 Storage::disk($disk)->delete($item->image);

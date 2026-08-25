@@ -2,18 +2,29 @@
 
 return [
     [
-        'label'=> 'Home',
-        'route'=> 'home',
+        'label' => 'Home',
+        'route' => 'home',
         'icon' => 'home'
     ],
     [
         'label' => 'Inventory',
-        'route' => 'inventory',
         'icon'  => 'package',
+        'children' => [
+            [
+                'label' => 'Products',
+                'icon'  => 'package',
+                'route' => 'inventory',
+            ],
+            [
+                'label' => 'Brands',
+                'icon'  => 'tags',
+                'route' => 'brands',
+            ],
+            [
+                'label' => 'Categories',
+                'icon'  => 'shapes',
+                'route' => 'category',
+            ],
+        ]
     ],
-    [
-        'label' => 'POS',
-        'route' => 'inventory',
-        'icon'  => 'shopping-basket',
-    ]
 ];
