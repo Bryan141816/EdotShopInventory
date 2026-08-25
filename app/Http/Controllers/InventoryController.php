@@ -86,8 +86,8 @@ class InventoryController extends Controller
                 'quantity' => 'required|integer|min:0',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'remove_image' => 'nullable|boolean',
-                'brand_id' => 'integer',
-                'category_id' => 'integer'
+                'brand_id' => 'nullable|integer',
+                'category_id' => 'nullable|integer'
             ]);
         } catch (ValidationException $e) {
             dd($e->errors());

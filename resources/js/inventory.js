@@ -18,13 +18,11 @@ export default () => ({
   brands: null,
   category: null,
 
-
-
-  async openItemModal() {
-    this.itemModalOpen = true;
-
+  async fetchBrandAndCategory() {
     try {
-      const response = await fetch("/api/brand_category");
+      const response = await fetch("/api/brand_category", {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
@@ -34,6 +32,10 @@ export default () => ({
     } catch (error) {
       console.error(error.message);
     }
+  },
+  openItemModal() {
+    this.itemModalOpen = true;
+
   },
 
   itemModalClose() {
@@ -51,7 +53,7 @@ export default () => ({
       category_id: ""
     };
     this.id = null;
-    this.title = 'Add Item'
+    this.itemModalTitle = 'Add Item'
   },
 
   handleImage(event) {
@@ -93,11 +95,10 @@ export default () => ({
     this.id = row.getAttribute('name');
   },
   handleEditClick(event) {
-    console.log(this)
     const button = event.target;
     const row = button.closest('tr');
     this.id = row.getAttribute('name');
-
+    this.fetchBrandAndCategory();
     this.itemInput = {
       name: row.querySelector('[data-key="name"]').getAttribute('data-value'),
       sku: row.querySelector('[data-key="sku"]').getAttribute('data-value'),
@@ -109,7 +110,7 @@ export default () => ({
     }
     this.itemModalOpen = true;
     this.isEdit = true;
-    this.title = "Update Item";
+    this.itemModalTitle = "Update Item";
   },
 
   //Brand & Category

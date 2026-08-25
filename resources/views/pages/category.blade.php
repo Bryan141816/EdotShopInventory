@@ -4,6 +4,32 @@
 
 @section('content')
     <div class="flex flex-col h-full w-full" x-data="category">
+        <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
+            <form class="flex flex-col gap-4 p-3 pt-0" action="{{ route('category.store') }}" method="POST">
+                @csrf
+                <div class="flex flex-col gap-1">
+                    <label for="brand-name" class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
+                    <input id="brand-name" name="name" type="text" required maxlength="255"
+                        class="rounded border border-gray-300 px-2 py-1" placeholder="Enter brand name"
+                        x-model="brandInput.name">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="brand-description" class="text-sm font-medium">Description</label>
+                    <textarea id="brand-description" name="description" rows="3"
+                        class="resize-none rounded border border-gray-300 px-2 py-1" placeholder="Optional description"
+                        x-model="brandInput.description"></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="closeModal"
+                        class="rounded bg-gray-300 px-4 py-2 font-bold text-gray-700 hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        x-text="title"></button>
+                </div>
+            </form>
+        </x-modal>
         <h3 class="font-semibold text-2xl">Category</h3>
         <div class="flex flex-row justify-between mb-4">
             <form action={{ route('brands') }} method="GET">
@@ -16,9 +42,9 @@
                 </button>
             </form>
             <button class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
-                @click="openItemModal">
+                @click="openModal">
                 <x-lucide-plus class="mr-2 h-4 w-4" />
-                <span>Add Item</span>
+                <span>Add Category</span>
             </button>
         </div>
         <x-data-table :headers="[

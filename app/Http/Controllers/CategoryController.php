@@ -23,20 +23,38 @@ class CategoryController extends Controller
 
         return view('pages.category', compact('category'));
     }
-    public function store(Request $request)
+    private function commonStore(Request $request)
     {
-        try {
-
-            $request->validate([
+        $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string'
             ]);
 
-            $category = new PartCategory;
-            $category->name = strtoupper($request->input('name'));
-            $category->description = $request->input('description');
-            $category->save();
-
+        $category = new PartCategory();
+        $category->name = strtoupper($request->input('name'));
+        $category->description = $request->input('description');
+        $category->save();
+    }
+    public function store(Request $request)
+    {
+        try {
+            $this->commonStore($request);
+            return redirect()->back()->with('success', 'Category added successfully!');
+        } catch (ValidationException $e) {
+            dd($e);
+        } catch (QueryException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                return redirect()->back()->with('error', 'Category with this name already exist');
+            }
+            return redirect()->back()->with('error', 'An error occured in the database');
+        } catch (Exception $e) {
+            dd($e);
+        }
+    }
+    public function apiStore(Request $request)
+    {
+        try {
+            $category = $this->commonStore($request);
             return response()->json([
                 "category" => $category
             ], 200);
