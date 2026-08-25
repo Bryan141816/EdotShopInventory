@@ -58,4 +58,9 @@ class CategoryController extends Controller
             dd($e);
         }
     }
+    public function destroy(PartCategory $category)
+    {
+        $category->delete();
+        return redirect()->back()->with('success', 'Category deleted successfully');
+    }
 }

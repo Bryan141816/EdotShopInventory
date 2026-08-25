@@ -3,13 +3,12 @@
 @section('title', 'Inventory | Category')
 
 @section('content')
-   <div class="flex flex-col h-full w-full" >
+    <div class="flex flex-col h-full w-full" x-data="category">
         <h3 class="font-semibold text-2xl">Category</h3>
         <div class="flex flex-row justify-between mb-4">
             <form action={{ route('brands') }} method="GET">
-                <input type="text" name="search" placeholder="Search..."
-                    class="border border-gray-300 rounded px-2 py-1" id="search-input"
-                    value="{{ request('search', '') }}">
+                <input type="text" name="search" placeholder="Search..." class="border border-gray-300 rounded px-2 py-1"
+                    id="search-input" value="{{ request('search', '') }}">
 
                 <button type="submit"
                     class="inline-flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 ml-2">
@@ -32,14 +31,18 @@
                 'key' => 'description',
                 'type' => 'text',
             ],
+            'Actions' => [
+                'key' => 'action',
+                'type' => 'action',
+            ],
         ]" :rows="$category">
-            {{-- <x-slot name="action">
+            <x-slot name="action">
                 <div class="flex flex-row gap-2">
                     <button @click="handleEditClick"
                         class="inline-flex items-center rounded bg-yellow-500 px-2 py-1 font-bold text-white hover:bg-yellow-600">
                         <x-lucide-edit class="h-4 w-4" />
                     </button>
-                    <form method="POST" :action="'/inventory/' + id" class="inline">
+                    <form method="POST" :action="'/category/' + id" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" @click="handleDeleteClick"
@@ -48,7 +51,7 @@
                         </button>
                     </form>
                 </div>
-            </x-slot> --}}
+            </x-slot>
         </x-data-table>
         <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3">
 

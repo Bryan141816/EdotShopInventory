@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/brands', [BrandController::class, 'apiStore'])->name('brand.store');
     Route::delete('/brands/{brand}',[BrandController::class, 'destroy'])->name('brand.destroy');
     Route::get('/category', [CategoryController::class, 'index'])->name('category');
+    Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
     Route::post('/api/category', [CategoryController::class, 'store'])->name('category.store');
     
 });
