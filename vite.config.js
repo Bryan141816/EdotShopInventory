@@ -7,10 +7,11 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/css/app.css', 
+                'resources/css/app.css',
                 'resources/js/app.js',
-                'resources/js/inventory/item-modal.js',
-                'resources/js/inventory/item-table.js'
+                'resources/js/inventory.js',
+                'resources/js/brand.js',
+                'resources/js/category.js',
             ],
             refresh: true,
             fonts: [
