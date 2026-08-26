@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use App\Models\PartCategory;
-use Exception;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
@@ -25,86 +22,40 @@ class CategoryController extends Controller
         return view('pages.category', compact('category'));
     }
 
-    private function commonStore(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
 
         $category = new PartCategory;
         $category->name = strtoupper($request->input('name'));
         $category->description = $request->input('description');
         $category->save();
+
+        return redirect()->back()->with('success', 'Category added successfully!');
+
     }
 
-    public function store(Request $request)
+    public function apiStore(CategoryRequest $request)
     {
-        try {
-            $this->commonStore($request);
 
-            return redirect()->back()->with('success', 'Category added successfully!');
-        } catch (ValidationException $e) {
-            dd($e);
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] == 1062) {
-                return redirect()->back()->with('error', 'Category with this name already exist');
-            }
+        $category = new PartCategory;
+        $category->name = strtoupper($request->input('name'));
+        $category->description = $request->input('description');
+        $category->save();
 
-            return redirect()->back()->with('error', 'An error occured in the database');
-        } catch (Exception $e) {
-            dd($e);
-        }
+        return response()->json([
+            'category' => $category,
+        ], 200);
+
     }
 
-    public function apiStore(Request $request)
+    public function edit(CategoryRequest $request, PartCategory $category)
     {
-        try {
-            $category = $this->commonStore($request);
 
-            return response()->json([
-                'category' => $category,
-            ], 200);
-        } catch (ValidationException $e) {
-            dd($e);
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] == 1062) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'A category with this name already exists.',
-                ], 409);
-            }
+        $category->name = $request->input('name');
+        $category->description = $request->input('description');
+        $category->save();
 
-            return response()->json([
-                'success' => false,
-                'message' => 'A database error occurred.',
-            ], 500);
-        } catch (Exception $e) {
-            dd($e);
-        }
-    }
-
-    public function edit(Request $request, PartCategory $category)
-    {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-            ]);
-
-            $category->name = $request->input('name');
-            $category->description = $request->input('description');
-
-            $category->save();
-
-            return redirect()->back()->with('success', 'Category updated successfully');
-        } catch (ValidationException $e) {
-            dd($e->errors());
-        } catch (QueryException $e) {
-            return redirect()->back()->with('error', 'An error occured in the database');
-        } catch (RecordNotFoundException $e) {
-            return redirect()->back()->with('erro', 'Category not found');
-        }
+        return redirect()->back()->with('success', 'Category updated successfully');
     }
 
     public function destroy(PartCategory $category)

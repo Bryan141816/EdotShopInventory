@@ -3,22 +3,12 @@
 @section('title', 'Inventory | Brands')
 
 @section('content')
-    {{-- @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif --}}
+    <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="brand">
 
         <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
             
-            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/brands/${id}`: '/brands'" method="POST">
+            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/inventory/brands/${id}`: '/inventory/brands'" method="POST">
                 @csrf
                 <template x-if="isEdit">
                     <input type="hidden" name="_method" value="PATCH">
@@ -48,7 +38,7 @@
         </x-modal>
         <h3 class="font-semibold text-2xl">Brands</h3>
         <div class="flex flex-row justify-between mb-4">
-            <form action={{ route('brands') }} method="GET">
+            <form action={{ route('inventory.brands') }} method="GET">
                 <input type="text" name="search" placeholder="Search..."
                     class="border border-gray-300 rounded px-2 py-1" id="search-input" value="{{ request('search', '') }}">
 
@@ -84,7 +74,7 @@
                         class="inline-flex items-center rounded bg-yellow-500 px-2 py-1 font-bold text-white hover:bg-yellow-600">
                         <x-lucide-edit class="h-4 w-4" />
                     </button>
-                    <form method="POST" :action="'/brands/' + id" class="inline">
+                    <form method="POST" :action="'/inventory/brands/' + id" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" @click="handleDeleteClick"

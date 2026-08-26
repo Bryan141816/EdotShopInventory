@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BrandRequest;
 use App\Models\PartBrands;
-use Exception;
-use Illuminate\Database\QueryException;
-use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class BrandController extends Controller
 {
@@ -25,94 +22,43 @@ class BrandController extends Controller
         return view('pages.brands', compact('brands'));
     }
 
-    private function commonStore(Request $request)
+    public function store(BrandRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        $brand = new PartBrands;
+        $brand->name = strtoupper($request->input('name'));
+        $brand->description = $request->input('description');
+        $brand->save();
+
+        return redirect()->back()->with('success', 'Brand created successfully');
+    }
+
+    public function apiStore(BrandRequest $request)
+    {
 
         $brand = new PartBrands;
         $brand->name = strtoupper($request->input('name'));
         $brand->description = $request->input('description');
         $brand->save();
 
-        return $brand;
+        return response()->json([
+            'brand' => $brand,
+        ], 200);
+
     }
 
-    public function store(Request $request)
+    public function edit(BrandRequest $request, PartBrands $brand)
     {
-        try {
-            $this->commonStore($request);
+        $brand->name = $request->input('name');
+        $brand->description = $request->input('description');
+        $brand->save();
 
-            return redirect()->back()->with('success', 'Brand added successfully!');
-        } catch (ValidationException $e) {
-            dd($e);
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] == 1062) {
-                return redirect()->back()->with('error', 'Brand with this name already exist');
-            }
-
-            return redirect()->back()->with('error', 'An error occured in the database');
-        } catch (Exception $e) {
-            dd($e);
-        }
-    }
-
-    public function apiStore(Request $request)
-    {
-        try {
-            $brand = $this->commonStore($request);
-
-            return response()->json([
-                'brand' => $brand,
-            ], 200);
-        } catch (ValidationException $e) {
-            dd($e);
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] == 1062) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'A brand with this name already exists.',
-                ], 409);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'A database error occurred.',
-            ], 500);
-        } catch (Exception $e) {
-            dd($e);
-        }
-    }
-
-    public function edit(Request $request, PartBrands $brand)
-    {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-            ]);
-            $brand->name = $request->input('name');
-            $brand->description = $request->input('description');
-
-            $brand->save();
-
-            return redirect()->back()->with('success', 'Brand updated successfully');
-        } catch (ValidationException $e) {
-            dd($e->errors());
-        } catch (QueryException $e) {
-            return redirect()->back()->with('error', 'An error occured in the database');
-        } catch (RecordNotFoundException $e) {
-            return redirect()->back()->with('error', 'Brand not found');
-        }
-
+        return redirect()->back()->with('success', 'Brand updated successfully');
     }
 
     public function destroy(PartBrands $brand)
     {
         $brand->delete();
 
-        return redirect()->back()->with('sucess', 'Brand deleted successfully');
+        return redirect()->back()->with('success', 'Brand deleted successfully');
     }
 }

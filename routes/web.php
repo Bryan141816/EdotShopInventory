@@ -11,23 +11,23 @@ Route::middleware('auth')->group(function () {
         return view('pages.home');
     })->name('home');
 
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
-    Route::delete('/inventory/{item}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
-    Route::patch('/inventory/{item}', [InventoryController::class, 'edit'])->name('products.edit');
+    Route::get('/inventory/products', [InventoryController::class, 'index'])->name('inventory.products');
+    Route::post('/inventory/products', [InventoryController::class, 'store'])->name('inventory.products.store');
+    Route::delete('/inventory/products/{item}', [InventoryController::class, 'destroy'])->name('inventory.products.destroy');
+    Route::patch('/inventory/products/{item}', [InventoryController::class, 'edit'])->name('inventory.products.edit');
 
-    Route::get('/api/brand_category', [BrandCategoryController::class, 'index'])->name('brand_category');
+    Route::get('/api/brand_category', [BrandCategoryController::class, 'index'])->name('inventory.brand_category');
 
-    Route::get('/brands', [BrandController::class, 'index'])->name('brands');
-    Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
-    Route::post('/api/brands', [BrandController::class, 'apiStore'])->name('brand.api_store');
-    Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
-    Route::patch('/brands/{brand}', [BrandController::class, 'edit'])->name('brand.edit');
+    Route::get('/inventory/brands', [BrandController::class, 'index'])->name('inventory.brands');
+    Route::post('/inventory/brands', [BrandController::class, 'store'])->name('inventory.brands.store');
+    Route::post('/api/inventory/brands', [BrandController::class, 'apiStore'])->name('inventory.brand.api_store');
+    Route::delete('/inventory/brands/{brand}', [BrandController::class, 'destroy'])->name('inventory.brand.destroy');
+    Route::patch('/inventory/brands/{brand}', [BrandController::class, 'edit'])->name('inventory.brand.edit');
 
-    Route::get('/category', [CategoryController::class, 'index'])->name('category');
-    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
-    Route::post('/api/category', [CategoryController::class, 'apiStore'])->name('category.api_store');
-    Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
-    Route::patch('/category/{category}', [CategoryController::class, 'edit'])->name('category.edit');
+    Route::get('/inventory/category', [CategoryController::class, 'index'])->name('inventory.category');
+    Route::post('/inventory/category', [CategoryController::class, 'store'])->name('inventory.category.store');
+    Route::post('/api/inventory/category', [CategoryController::class, 'apiStore'])->name('inventory.category.api_store');
+    Route::delete('/inventory/category/{category}', [CategoryController::class, 'destroy'])->name('inventory.category.destroy');
+    Route::patch('/inventory/category/{category}', [CategoryController::class, 'edit'])->name('inventory.category.edit');
 
 });

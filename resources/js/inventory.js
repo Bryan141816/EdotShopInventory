@@ -153,7 +153,7 @@ export default () => ({
     this.brandError = "";
 
     try {
-      const url = this.brandModalmode == "brand" ? "/api/brands" : "/api/category";
+      const url = this.brandModalmode == "brand" ? "/api/inventory/brands" : "/api/inventory/category";
       const response = await fetch(url, {
         method: "POST",
         headers: { Accept: "application/json" },

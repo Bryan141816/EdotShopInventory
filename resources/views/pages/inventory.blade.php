@@ -3,6 +3,7 @@
 @section('title', 'Inventory | Products')
 
 @section('content')
+    <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="inventory">
 
         <x-modal title="brandModalTitle" closeModal="closeBrandModal" x-show="brandModalOpen" class="z-999">
@@ -35,7 +36,7 @@
 
         <x-modal openState="itemModalOpen" closeModal="itemModalClose" x-show="itemModalOpen" title="itemModalTitle">
             <form enctype="multipart/form-data" id="item-form" method="POST"
-                :action="isEdit ? `/inventory/${id}` : '/inventory'" class="flex flex-col p-3 pt-0">
+                :action="isEdit ? `/inventory/products/${id}` : '/inventory/products'" class="flex flex-col p-3 pt-0">
                 @csrf
                 <template x-if="isEdit">
                     <input type="hidden" name="_method" value="PATCH">
@@ -196,7 +197,7 @@
 
         <h3 class="font-semibold text-2xl">Products</h3>
         <div class="flex flex-row justify-between mb-4">
-            <form action="/inventory" method="GET">
+            <form action="/inventory/products" method="GET">
                 <input type="text" name="search" placeholder="Search..."
                     class="border border-gray-300 rounded px-2 py-1" id="search-input"
                     value="{{ request('search', '') }}">
@@ -265,7 +266,7 @@
                         class="inline-flex items-center rounded bg-yellow-500 px-2 py-1 font-bold text-white hover:bg-yellow-600">
                         <x-lucide-edit class="h-4 w-4" />
                     </button>
-                    <form method="POST" :action="'/inventory/' + id" class="inline">
+                    <form method="POST" :action="'/inventory/products/' + id" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" @click="handleDeleteClick"

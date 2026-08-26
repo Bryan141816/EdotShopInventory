@@ -2,9 +2,11 @@
     @foreach ($items as $item)
         @php
             $hasChildren = !empty($item['children']);
-            $hasActiveChild = $hasChildren && collect($item['children'])->contains(
-                fn ($child) => request()->routeIs($child['route']),
-            );
+            $hasActiveChild = $hasChildren && collect($item['children'])->contains(function ($child) use ($item) {
+                $childRoute = $item['route'] . '.' . $child['route'];
+
+                return request()->routeIs($childRoute) || request()->routeIs($childRoute . '.*');
+            });
         @endphp
 
         <div x-data="{ open: {{ $hasActiveChild ? 'true' : 'false' }} }" class="w-full">
@@ -28,7 +30,11 @@
 
                 <div x-cloak x-show="open" x-transition class="mt-1 flex flex-col gap-1 pl-6">
                     @foreach ($item['children'] as $child)
-                        <a href="{{ route($child['route']) }}" @class([
+                        @php
+                            $childRoute = $item['route'] . '.' . $child['route'];
+                        @endphp
+
+                        <a href="{{ route($childRoute) }}" @class([
                             'flex',
                             'items-center',
                             'gap-2',
@@ -37,7 +43,7 @@
                             'pl-3',
                             'font-normal',
                             'hover:bg-gray-100',
-                            'bg-gray-200' => request()->routeIs($child['route']),
+                            'bg-gray-200' => request()->routeIs($childRoute) || request()->routeIs($childRoute . '.*'),
                         ])>
                             <x-dynamic-component :component="'lucide-' . ($child['icon'] ?? 'file')" class="h-4 w-4" />
                             <span>{{ $child['label'] }}</span>

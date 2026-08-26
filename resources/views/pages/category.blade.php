@@ -3,9 +3,10 @@
 @section('title', 'Inventory | Category')
 
 @section('content')
+    <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="category">
         <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
-            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/category/${id}`: '/category'" method="POST">
+            <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/inventory/category/${id}`: '/inventory/category'" method="POST">
                 @csrf
                 <template x-if="isEdit">
                     <input type="hidden" name="_method" value="PATCH">
@@ -35,7 +36,7 @@
         </x-modal>
         <h3 class="font-semibold text-2xl">Category</h3>
         <div class="flex flex-row justify-between mb-4">
-            <form action={{ route('category') }} method="GET">
+            <form action={{ route('inventory.category') }} method="GET">
                 <input type="text" name="search" placeholder="Search..." class="border border-gray-300 rounded px-2 py-1"
                     id="search-input" value="{{ request('search', '') }}">
 
@@ -71,7 +72,7 @@
                         class="inline-flex items-center rounded bg-yellow-500 px-2 py-1 font-bold text-white hover:bg-yellow-600">
                         <x-lucide-edit class="h-4 w-4" />
                     </button>
-                    <form method="POST" :action="'/category/' + id" class="inline">
+                    <form method="POST" :action="'/inventory/category/' + id" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" @click="handleDeleteClick"

@@ -4,27 +4,28 @@ return [
     [
         'label' => 'Home',
         'route' => 'home',
-        'icon' => 'home'
+        'icon' => 'home',
     ],
     [
         'label' => 'Inventory',
-        'icon'  => 'package',
+        'icon' => 'package',
+        'route' => 'inventory',
         'children' => [
             [
                 'label' => 'Products',
-                'icon'  => 'package',
-                'route' => 'inventory',
+                'icon' => 'package',
+                'route' => 'products',
             ],
             [
                 'label' => 'Brands',
-                'icon'  => 'tags',
+                'icon' => 'tags',
                 'route' => 'brands',
             ],
             [
                 'label' => 'Categories',
-                'icon'  => 'shapes',
+                'icon' => 'shapes',
                 'route' => 'category',
             ],
-        ]
+        ],
     ],
 ];

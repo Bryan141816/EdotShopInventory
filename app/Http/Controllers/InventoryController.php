@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\InventoryRequest;
 use App\Models\Items;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 
 class InventoryController extends Controller
 {
@@ -23,22 +23,12 @@ class InventoryController extends Controller
             })
             ->paginate($pageLength)
             ->withQueryString();
+
         return view('pages.inventory', compact('inventory'));
     }
 
-    public function store(Request $request)
+    public function store(InventoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'string',
-            'description' => 'nullable|string',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'brand_id' => 'nullable|integer',
-            'category_id' => 'nullable|integer'
-        ]);
 
         $items = new Items;
         $items->name = $request->input('name');
@@ -74,24 +64,8 @@ class InventoryController extends Controller
         return redirect()->back()->with('success', 'Product deleted successfully!');
     }
 
-    public function edit(Request $request, Items $item)
+    public function edit(InventoryRequest $request, Items $item)
     {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'sku' => 'string',
-                'description' => 'nullable|string',
-                'cost_price' => 'required|numeric|min:0',
-                'selling_price' => 'required|numeric|min:0',
-                'quantity' => 'required|integer|min:0',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-                'remove_image' => 'nullable|boolean',
-                'brand_id' => 'nullable|integer',
-                'category_id' => 'nullable|integer'
-            ]);
-        } catch (ValidationException $e) {
-            dd($e->errors());
-        }
 
         $item->name = $request->input('name');
         $item->sku = $request->input('sku');
