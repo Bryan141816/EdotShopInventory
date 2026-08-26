@@ -73,7 +73,8 @@ resource "azurerm_linux_web_app" "inventory" {
     APP_ENV   = "production"
     APP_DEBUG = "false"
     APP_KEY   = var.app_key
-
+    APP_URL   = "https://edot-shop-inventory-app.azurewebsites.net"
+    ASSET_URL = "/public"
     # Filesystem
     FILESYSTEM_DISK = "azure"
 

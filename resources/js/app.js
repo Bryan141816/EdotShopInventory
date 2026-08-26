@@ -1,7 +1,12 @@
 import Alpine from "alpinejs";
-import itemModal from "./inventory/item-modal";
+import inventory from "./inventory";
+import brand from "./brand"
+import category from "./category";
 
-Alpine.data('itemModal', itemModal);
+Alpine.data('inventory', inventory);
+Alpine.data('brand', brand);
+Alpine.data('category', category);
+
 window.Alpine = Alpine;
 
 Alpine.start();

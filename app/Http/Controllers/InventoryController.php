@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\InventoryRequest;
 use App\Models\Items;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,7 @@ class InventoryController extends Controller
         $search = $request->input('search');
         $pageLength = $request->input('page_length', 10);
 
-        $inventory = Items::query()
+        $inventory = Items::with(['brand', 'category'])
             ->when($search, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")
@@ -23,23 +24,11 @@ class InventoryController extends Controller
             ->paginate($pageLength)
             ->withQueryString();
 
-        $count = Items::count();
-
-        return view('pages.inventory', compact('inventory', 'count'));
+        return view('pages.inventory', compact('inventory'));
     }
 
-    public function store(Request $request)
+    public function store(InventoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'string',
-            'description' => 'nullable|string',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-
-        ]);
 
         $items = new Items;
         $items->name = $request->input('name');
@@ -48,6 +37,8 @@ class InventoryController extends Controller
         $items->cost_price = $request->input('cost_price');
         $items->selling_price = $request->input('selling_price');
         $items->quantity = $request->input('quantity');
+        $items->brand_id = $request->input('brand_id');
+        $items->category_id = $request->input('category_id');
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -73,22 +64,8 @@ class InventoryController extends Controller
         return redirect()->back()->with('success', 'Product deleted successfully!');
     }
 
-    public function edit(Request $request, Items $item)
+    public function edit(InventoryRequest $request, Items $item)
     {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'sku' => 'string',
-                'description' => 'nullable|string',
-                'cost_price' => 'required|numeric|min:0',
-                'selling_price' => 'required|numeric|min:0',
-                'quantity' => 'required|integer|min:0',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-                'remove_image' => 'nullable|boolean',
-            ]);
-        } catch (ValidationException $e) {
-            dd($e->errors());
-        }
 
         $item->name = $request->input('name');
         $item->sku = $request->input('sku');
@@ -96,6 +73,8 @@ class InventoryController extends Controller
         $item->cost_price = $request->input('cost_price');
         $item->selling_price = $request->input('selling_price');
         $item->quantity = $request->input('quantity');
+        $item->brand_id = $request->input('brand_id');
+        $item->category_id = $request->input('category_id');
 
         $disk = config('filesystems.default');
 
@@ -105,7 +84,6 @@ class InventoryController extends Controller
             }
 
             $item->image = null;
-
         } elseif ($request->hasFile('image')) {
             if ($item->image) {
                 Storage::disk($disk)->delete($item->image);

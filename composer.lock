@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3cbaafda08898ea09535eb3779ac196a",
+    "content-hash": "3b7b9c135571d649fafd0718bccaeda6",
     "packages": [
         {
             "name": "azure-oss/identity",
