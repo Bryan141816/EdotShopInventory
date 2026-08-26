@@ -31,7 +31,7 @@ jobs:
 
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
-        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
+        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -56,6 +56,12 @@ jobs:
             !tests/
             !.env
             !terraform/
+            !.gitignore
+            !.gitattributes
+            !phpunit.xml
+            !vite.config.js
+            !README.md
+            
   deploy:
     runs-on: ubuntu-latest
     needs: build
