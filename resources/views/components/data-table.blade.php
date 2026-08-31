@@ -16,17 +16,26 @@
 
 }">
 
-    <x-modal x-show="imageViewerOpen">
+    <x-modal x-show="imageViewerOpen" modal-title="">
         <x-slot>
-            <img :src="image" class="max-h-[80vh] max-w-[80vw] h-auto w-auto object-contain rounded-xl">
+            <div class="flex p-4">
+                <img :src="image" class="max-h-[80vh] max-w-[80vw] h-auto w-auto object-contain rounded-xl">
+            </div>
         </x-slot>
     </x-modal>
     <table class="w-full table-auto">
         <thead class="text-[13px] font-medium text-slate-500/70">
             <tr>
                 @foreach ($headers as $label => $column)
-                    <th
-                        class="whitespace-nowrap bg-slate-100 px-5 py-2 text-left first:rounded-l first:pl-3 last:rounded-r last:pr-3">
+                    @php
+                        $type = $column['type'] ?? 'text';
+                        $isHidden = ($column['hidden'] ?? false) || $type === 'hidden';
+                    @endphp
+
+                    <th @class([
+                        'whitespace-nowrap bg-slate-100 px-5 py-2 text-left first:rounded-l first:pl-3 last:rounded-r last:pr-3',
+                        'hidden' => $isHidden,
+                    ])>
                         {{ $label }}
                     </th>
                 @endforeach
@@ -40,9 +49,13 @@
                         @php
                             $value = data_get($item, $column['key']);
                             $type = $column['type'] ?? 'text';
+                            $isHidden = ($column['hidden'] ?? false) || $type === 'hidden';
                         @endphp
 
-                        <td class="whitespace-nowrap px-5 py-3 first:pl-3 last:pr-3" data-key="{{ $column['key'] }}"
+                        <td @class([
+                            'whitespace-nowrap px-5 py-3 first:pl-3 last:pr-3',
+                            'hidden' => $isHidden,
+                        ]) data-key="{{ $column['key'] }}"
                             data-value="{{ $type === 'image' && $value ? Storage::url($value) : ($type === 'image' ? '' : $value) }}">
                             @switch($type)
                                 @case('text')
@@ -52,23 +65,10 @@
                                 @case('image')
                                     @if ($value)
                                         <div class="group relative w-fit">
-                                            {{-- Thumbnail --}}
                                             <img src="{{ Storage::url($value) }}" alt="{{ $label }}"
                                                 class="size-10 rounded-lg border border-slate-600 object-cover"
                                                 @click="openViewer($event)">
 
-                                            {{-- Preview
-                                            <div class="pointer-events-none fixed z-50 hidden group-hover:block"
-                                                style="
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                ">
-                                                <div class="rounded-xl border border-slate-200 bg-white p-2 shadow-2xl">
-                                                    <img src="{{ Storage::url($value) }}" alt="{{ $label }}"
-                                                        class="h-72 w-72 rounded-lg object-contain">
-                                                </div>
-                                            </div> --}}
                                         </div>
                                     @else
                                         <div
@@ -114,7 +114,6 @@
                                         </span>
                                     @endif
                                 @break
-
                                 @case('action')
                                     {{ $action }}
                                 @break

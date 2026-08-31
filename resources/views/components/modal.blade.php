@@ -12,7 +12,7 @@
         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
         x-transition:leave-end="opacity-0 scale-90 translate-y-3" @click.stop>
         <div class="flex flex-row justify-between items-center mb-4 gap-3 p-3 pb-0">
-            <h3 class="font-semibold text-base" x-text="{{ $attributes->get('title', 'title') }}"></h3>
+            <h3 class="font-semibold text-base" x-text="{{ $attributes->get('modal-title', 'title') }}"></h3>
 
             <button data-modal-close="{{ $attributes->get('id') }}"
                 @click="{{ $attributes->get('closeModal', 'closeModal') }}">

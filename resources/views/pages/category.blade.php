@@ -5,7 +5,7 @@
 @section('content')
     <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="category">
-        <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
+        <x-modal modal-title="title" closeModal="closeModal" x-show="open" class="z-999">
             <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/inventory/category/${id}`: '/inventory/category'" method="POST">
                 @csrf
                 <template x-if="isEdit">

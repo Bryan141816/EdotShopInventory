@@ -6,7 +6,7 @@
     <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="brand">
 
-        <x-modal title="title" closeModal="closeModal" x-show="open" class="z-999">
+        <x-modal modal-title="title" closeModal="closeModal" x-show="open" class="z-999">
             
             <form class="flex flex-col gap-4 p-3 pt-0" :action="isEdit? `/inventory/brands/${id}`: '/inventory/brands'" method="POST">
                 @csrf
