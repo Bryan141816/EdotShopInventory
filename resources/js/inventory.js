@@ -94,11 +94,11 @@ export default () => ({
     const row = button.closest('tr');
     this.id = row.getAttribute('name');
   },
-  handleEditClick(event) {
+  async handleEditClick(event) {
     const button = event.target;
     const row = button.closest('tr');
     this.id = row.getAttribute('name');
-    this.fetchBrandAndCategory();
+    await this.fetchBrandAndCategory();
     this.itemInput = {
       name: row.querySelector('[data-key="name"]').getAttribute('data-value'),
       sku: row.querySelector('[data-key="sku"]').getAttribute('data-value'),
@@ -107,6 +107,8 @@ export default () => ({
       quantity: row.querySelector('[data-key="quantity"]').getAttribute('data-value'),
       description: row.querySelector('[data-key="description"]').getAttribute('data-value'),
       image: row.querySelector('[data-key="image"]').getAttribute('data-value'),
+      brand_id: row.querySelector('[data-key="brand_id"]').getAttribute('data-value'),
+      category_id: row.querySelector('[data-key="category_id"]').getAttribute('data-value'),
     }
     this.itemModalOpen = true;
     this.isEdit = true;

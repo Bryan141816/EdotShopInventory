@@ -6,7 +6,7 @@
     <x-toast-message/>
     <div class="flex flex-col h-full w-full" x-data="inventory">
 
-        <x-modal title="brandModalTitle" closeModal="closeBrandModal" x-show="brandModalOpen" class="z-999">
+        <x-modal modal-title="brandModalTitle" closeModal="closeBrandModal" x-show="brandModalOpen" class="z-999">
             <form x-ref="brandForm" @submit.prevent="createBrand" class="flex flex-col gap-4 p-3 pt-0">
                 @csrf
                 <div class="flex flex-col gap-1">
@@ -34,7 +34,7 @@
             </form>
         </x-modal>
 
-        <x-modal openState="itemModalOpen" closeModal="itemModalClose" x-show="itemModalOpen" title="itemModalTitle">
+        <x-modal openState="itemModalOpen" closeModal="itemModalClose" x-show="itemModalOpen" modal-title="itemModalTitle">
             <form enctype="multipart/form-data" id="item-form" method="POST"
                 :action="isEdit ? `/inventory/products/${id}` : '/inventory/products'" class="flex flex-col p-3 pt-0">
                 @csrf
@@ -259,6 +259,14 @@
                 'key' => 'action',
                 'type' => 'action',
             ],
+            'Brand_ID' => [
+                'key' => 'brand_id',
+                'type' => 'hidden'
+            ],
+            'Category_ID'=>[
+                'key' => 'category_id',
+                'type' => 'hidden'
+            ]
         ]" :rows="$inventory">
             <x-slot name="action">
                 <div class="flex flex-row gap-2">
